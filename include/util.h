@@ -5,7 +5,10 @@
 
 #include <stdint.h>
 
-#define RAM_SIZE 65536
+#define RAM_SIZE 65536     // 64 kb
+
+#define DISK_SIZE 524288   // 512 kb
+#define BLOCK_SIZE 512     // 512 bytes
 
 // I love C so much 
 typedef uint8_t byte;

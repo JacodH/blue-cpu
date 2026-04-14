@@ -63,8 +63,8 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
     switch (opcode) {
         // Memory
         case 0x01: // SET r1-16 immediate
-            if (dev) {printf("SET r%d 0x%02x", a, b);}
-            cpu_ptr->registers[a] = b;
+            if (dev) {printf("SET r%d 0x%04x", a, (c << 8) | b);}
+            cpu_ptr->registers[a] = (c << 8) | b;
             cpu_ptr->PC += 4;
             break;
         default: 

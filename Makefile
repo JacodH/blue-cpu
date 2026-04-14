@@ -1,5 +1,5 @@
 CC = gcc
-SRC = src/main.c src/cpu.c
+SRC = src/main.c src/cpu.c src/disk.c
 INCLUDE = -I include
 OUT = blue-cpu.exe
 

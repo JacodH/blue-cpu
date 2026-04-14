@@ -6,15 +6,14 @@
 #include <stdint.h>
 
 struct CPU {
-    byte RAM[RAM_SIZE];       // 64 KB RAM 
+    byte RAM[RAM_SIZE];   // 64 KB RAM 
     word registers[16];   // 16 16 bit registers
-    bool kernel;              // Kernel bit (1 = kernel mode 0 = user mode)
+    bool kernel;          // Kernel bit (1 = kernel mode 0 = user mode)
 
     word PC;              // Program counter
-    word SP;              // Program counter
+    word SP;              // Stack counter
     word BASE;            // memory protection base
     word LIMIT;           // memory protection limit
-
 
     // emulation 
     bool running;
