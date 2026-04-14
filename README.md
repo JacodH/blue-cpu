@@ -20,14 +20,18 @@ No massive computation aside from pure emulation. ISA instructions should remain
    2. [File system](#file-system)
       1. [Disk layout](#disk-layout)
       2. [FAT table](#fat-table)
+3. [Emulation](#emulation)
+   1. [File structure]()
+   2. [Screen]()
+   3. [Disk]()
 
 # CPU
 ### Notes 
- - Little endian (low byte first)
  - 640 by 200 pixel screen (80 by 25 characters)
  - 64KB RAM (16 bit address space)
  - 16 registers 
- - 512KB disk (virtual disk file)
+ - 512KB disk
+ - Little endian (low byte first)
  - Lapse OS
  - Kernel / User mode 
  - SYSCALL + SYSRET instruction
@@ -73,7 +77,7 @@ DWRITE rADDR rBLOCK;    writes all bytes at rADDR from ram to disk at rBLOCK
 ```
 
 # Operating System (***Lapse 1.0***) 
-### Notes
+### Features
  - Memory protection
  - FAT like file system
  - Shell
@@ -108,3 +112,16 @@ Every block has an entry in the FAT table, the entry is 2 bytes and tells the FS
 | 0x0000        | Free block            |
 | 0xFFFF        | End of file           |
 | Anything else | Pointer to next block |
+
+# Emulation
+Notes on how im emulating the CPU, Disk and screen in C. 
+
+ - [ ] Make a 'cpu_memory_dump' feature to write CPU memory, disk and register data to file when called
+
+### File structure
+
+### Main loop
+
+### Disk
+
+### Screen
