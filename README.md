@@ -9,11 +9,21 @@ The goal of Blue is to make a CPU / Emulator capable of running a custom OS. Thi
 ## Emulation Philosophy
 No massive computation aside from pure emulation. ISA instructions should remain atomic and not "cheat". The emulator will not take any shortcuts that a real, physical CPU couldn't. 
 
-## Notes
- - Little endian (low byte first)
+## Table of Contents
+1. [CPU docs](#cpu)
+   1. [Notes](#notes)
+   2. [Memory map](#memory-map)
+   3. [Registers](#registers)
+   4. [ISA](#isa)
+2. [OS docs](#operating-system-lapse-10)
+   1. [Notes](#notes-1)
+   2. [File system](#file-system)
+      1. [Disk layout](#disk-layout)
+      2. [FAT table](#fat-table)
 
-# CPU Docs
+# CPU
 ### Notes 
+ - Little endian (low byte first)
  - 640 by 200 pixel screen (80 by 25 characters)
  - 64KB RAM (16 bit address space)
  - 16 registers 
@@ -62,7 +72,7 @@ DREAD rADDR rBLOCK;     writes all bytes at rBLOCK to ram starting at rADDR
 DWRITE rADDR rBLOCK;    writes all bytes at rADDR from ram to disk at rBLOCK
 ```
 
-# Operating System (***Lapse 1.0***) Docs 
+# Operating System (***Lapse 1.0***) 
 ### Notes
  - Memory protection
  - FAT like file system
