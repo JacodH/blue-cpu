@@ -15,6 +15,12 @@ No massive computation aside from pure emulation. ISA instructions should remain
    2. [Memory map](#memory-map)
    3. [Registers](#registers)
    4. [ISA](#isa)
+      1. [Memory](#memory-instructions)
+      2. [Arithmetic](#arithmetic-instructions)
+      3. [Control](#control-instructions)
+      4. [Stack](#stack-instructions)
+      5. [Disk](#disk-instructions)
+      6. [Emulation](#emulation-instructions)
 2. [OS docs](#operating-system-lapse-10)
    1. [Notes](#notes-1)
    2. [File system](#file-system)
@@ -69,12 +75,50 @@ BASE and LIMIT are privileged, meaning they can only be modified while in kernel
 
 ### ISA
 All instructions are 4 bytes wide. The CPU is little endian, meaning low bytes go first, then high. 
+***Memory check:*** Checks if kernel mode is true, if it is allow any address to change. If not, check to see if address is between BASE and LIMIT.
+***Kernel required:*** This instruction can only be executed while the kernel mode is true. (Inside syscall)
 
-```
-PRIVILEGED: 
-DREAD rADDR rBLOCK;     writes all bytes at rBLOCK to ram starting at rADDR
-DWRITE rADDR rBLOCK;    writes all bytes at rADDR from ram to disk at rBLOCK
-```
+#### Memory instructions
+| Code | Description                                 | Privilege note | Name | a    | b       | c            | Pseudo                                                                           |
+|------|---------------------------------------------|----------------|------|------|---------|--------------|---------------------------------------------------------------------------------|
+| `0x01` | Sets register to immediate                  |                | SET  | rTAR | IMM_LOW | IMM_HGIH     | rTAR = (IMM_HIGH << 8) \| IMM_LOW                                               |
+| `0x02` | Copies content from register to register    |                | MOV  | rSRC | rDST    |              | rDST = rSRC                                                                     |
+| `0x03` | Clears content in register                  |                | CLR  | rTAR |         |              | rTAR = 0                                                                        |
+| `0x04` | Loads RAM from register + offset            | Memory check   | GET  | rDST | rSRC    | IMM (signed) | rDST = RAM[rSRC+IMM] \| (RAM[rSRC+IMM+1] << 8)                                  |
+| `0x05` | Store register into RAM to address + offset | Memory check   | STR  | rSRC | rDST    | IMM (signed) | RAM[rDST+IMM]   = rSRC & 0xFF (low byte) RAM[rDST+IMM+1] = rSRC >> 8 (high byte) |
+
+#### Disk instructions
+| Code | Description                                                  | Privilege note   | Name   | a           | b           | c      | Pseudo                                              |
+|------|--------------------------------------------------------------|------------------|--------|-------------|-------------|--------|----------------------------------------------------|
+| `0xd1` | Reads all memory from disk and sends it to RAM a RAM address | Kernel required  | DREAD  | rADDR       | rBLOCK     |        | RAM[rADDR] = disk[rBLOCK]                          |
+| `0xd2` | Write memory from RAM to disk                                | Kernel required  | DWRITE | rADDR_START | rBLOCK      |        | disk[rBLOCK] = RAM[rADDR_START through rADDR_STOP] |
+
+#### Arithmetic instructions
+***(s)***: Signed value
+Division by zero returns 0.
+| Code | Description                            | Privilege note | Name | a    | b     | c     | Pseudo                     |
+|------|----------------------------------------|----------------|------|------|-------|-------|----------------------------|
+| 0xa1 | Adds two registeres                    |                | ADD  | rDST | rSRC1 | rSRC2 | rDST = rSRC1 + rSRC2       |
+| 0xa2 | Subtracts two registers                |                | SUB  | rDST | rSRC1 | rSRC2 | rDST = rSRC1 - rSRC2       |
+| 0xa3 | Multiplies two registers               |                | MUL  | rDST | rSRC1 | rSRC2 | rDST = rSRC1 * rSRC2       |
+| 0xa4 | Divides two registers                  |                | DIV  | rDST | rSRC1 | rSRC2 | rDST = rSRC1 / rSRC2       |
+| 0xa5 | Multiplies two signed registers        |                | SMUL | rDST | rSRC1 | rSRC2 | rDST = (s)rSRC1 * (s)rSRC2 |
+| 0xa6 | Divides two signed registerse          |                | SDIV | rDST | rSRC1 | rSRC2 | rDST = (s)rSRC1 / (s)rSRC2 |
+| 0xa7 | Adds an immediate to a register        |                | IADD | rDST | rSRC  | IMM   | rDST = rSRC + IMM          |
+| 0xa8 | Subtracts an immediate from a register |                | ISUB | rDST | rSRC  | IMM   | rDST = rSRC - IMM          |
+
+#### Control instructions
+| Code | Description     | Privilege note | Name | a     | b    | c | Pseudo                         |
+|------|-----------------|----------------|------|-------|------|---|-------------------------------|
+| `0xC0` | Halts the CPU    |                | HLT  |          |      |   | Stops CPU                     |
+| `0xC1` | No operation      |                | NOP  |          |      |   |                               |
+| `0xC2` | Jump to address   |                | JMP  | rADDR    |      |   | PC = rADDR                    |
+| `0xC3` | Jump to immediate |                | JMI  | IMM_ADDR |      |   | PC = IMM_ADDR                 |
+| `0xC4` | Jump if true      |                | JIT  | rADDR    | rSRC |   | if (rSRC == true) PC = rADDR  |
+| `0xC5` | Jump if false     |                | JIF  | rADDR    | rSRC |   | if (rSRC == false) PC = rADDR |
+
+#### Stack instructions
+#### Emulation instructions
 
 # Operating System (***Lapse 1.0***) 
 ### Features

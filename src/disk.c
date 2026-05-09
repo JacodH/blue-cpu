@@ -18,9 +18,9 @@ void disk_init(const char *path) {
         for (int i = 0; i < DISK_SIZE; i++) {
             fputc(0x00, disk_ptr);
         }
-        printf("Made an empty virtual disk file. ");
+        printf("Made an empty virtual disk file. \n");
     }else {
-        printf("Found disk file: %s", path);
+        printf("Found disk file: %s\n", path);
     }
 }
 

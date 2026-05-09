@@ -14,6 +14,9 @@
 typedef uint8_t byte;
 typedef uint16_t word;
 
+typedef int8_t sbyte;
+typedef int16_t sword;
+
 #define bool int
 #define true 1
 #define false 0

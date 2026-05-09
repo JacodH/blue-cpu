@@ -1,0 +1,4 @@
+SET r1 0x00;   RAM[0x00]
+SET r2 0x00;   Block[0x00]
+
+DREAD r1 r2;
