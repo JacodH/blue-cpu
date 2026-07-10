@@ -1,5 +1,5 @@
 # *blue*-cpu
-Custom CPU, ISA running on a custom C emulator made for research and practice in the C language. 
+Custom CPU and ISA running on a emulator made for research and practice in the C language. 
 
 > Gif of the emulator running will go here
 
