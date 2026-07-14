@@ -107,13 +107,23 @@ Division by zero returns 0.
 | 0xa7 | Adds an immediate to a register        |                | IADD | rDST | rSRC  | IMM   | rDST = rSRC + IMM          |
 | 0xa8 | Subtracts an immediate from a register |                | ISUB | rDST | rSRC  | IMM   | rDST = rSRC - IMM          |
 
+#### Comparison instructions 
+| Code | Description                       | Privilege note | Name | a    | b     | c     | Pseudo                      |
+|------|-----------------------------------|----------------|------|------|-------|-------|-----------------------------|
+| 0xb1 | Compares equality of registers    |                | EQ   | rDST | rSRC1 | rSRC2 | rDST = rSRC1 == rSRC2       |
+| 0xb2 | Compares inequality of registers  |                | NE   | rDST | rSRC1 | rSRC2 | rDST = rSRC1 != rSRC2       |
+| 0xb3 | Less than comparison              |                | LT   | rDST | rSRC1 | rSRC2 | rDST = rSRC1 < rSRC2       |
+| 0xb4 | Greater than comparison           |                | GT   | rDST | rSRC1 | rSRC2 | rDST = rSRC1 > rSRC2       |
+| 0xb5 | Less than comparison signed       |                | LTS  | rDST | rSRC1 | rSRC2 | rDST = (s)rSRC1 < (s)rSRC2 |
+| 0xb6 | Greater than comparison signed    |                | GTS  | rDST | rSRC1 | rSRC2 | rDST = (s)rSRC1 > (s)rSRC2 |
+
 #### Control instructions
 | Code | Description     | Privilege note | Name | a     | b    | c | Pseudo                         |
 |------|-----------------|----------------|------|-------|------|---|-------------------------------|
 | `0xC0` | Halts the CPU    |                | HLT  |          |      |   | Stops CPU                     |
 | `0xC1` | No operation      |                | NOP  |          |      |   |                               |
 | `0xC2` | Jump to address   |                | JMP  | rADDR    |      |   | PC = rADDR                    |
-| `0xC3` | Jump to immediate |                | JMI  | IMM_ADDR |      |   | PC = IMM_ADDR                 |
+| `0xC3` | Jump to immediate |                | IJMP  | IMM_ADDR |      |   | PC = IMM_ADDR                 |
 | `0xC4` | Jump if true      |                | JIT  | rADDR    | rSRC |   | if (rSRC == true) PC = rADDR  |
 | `0xC5` | Jump if false     |                | JIF  | rADDR    | rSRC |   | if (rSRC == false) PC = rADDR |
 

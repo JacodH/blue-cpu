@@ -100,7 +100,6 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
         }
 
         // Disk instructions 
-
         case 0xd1: { // DREAD r1-16 r1-16
             if (dev) {printf("DREAD RAM[%d] r%d", a, b);}
 
@@ -194,15 +193,26 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             if (dev) {printf("NOP");}
             cpu_ptr->PC += 4;
             break;
+        case 0xc2: // JMP r1-16
+            if (dev) {printf("JMP r%d", a);};
+            cpu_ptr->PC = cpu_ptr->registers[a];
+            break;
+        case 0xc3: // IJMP IMM
+            if (dev) {printf("IJMP (0x%02x, %d)", a, a);};
+            cpu_ptr->PC = a;
+            break;
         
+
         // Emulation instructions 
         case 0xe1: // OUT r1-16
-            printf("\nOUT r%d = [0x%04x, %d]", a, cpu_ptr->registers[a], cpu_ptr->registers[a]); 
+            if (dev == false) {printf("\n");};
+            printf("OUT r%d = [0x%04x, %d]", a, cpu_ptr->registers[a], cpu_ptr->registers[a]); 
             cpu_ptr->PC += 4;
             break;
 
         case 0xe2: // SOUT r1-16
-            printf("\nSOUT r%d = [0x%04x, %d]", a, (word)cpu_ptr->registers[a], (sword)cpu_ptr->registers[a]); 
+            if (dev == false) {printf("\n");};
+            printf("SOUT r%d = [0x%04x, %d]", a, (word)cpu_ptr->registers[a], (sword)cpu_ptr->registers[a]); 
             cpu_ptr->PC += 4;
             break;
 
