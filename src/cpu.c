@@ -27,6 +27,9 @@ void cpu_init(struct CPU *cpu_ptr) {
     // clear SP
     cpu_ptr->SP = 0x00;
 
+    // clear KSP (kernel stack pointer)
+    cpu_ptr->KSP = 0x00;
+
     // clear BASE
     cpu_ptr->BASE = 0x00;
     
@@ -45,10 +48,18 @@ void cpu_log_registers(struct CPU *cpu_ptr) {
     }
 }
 
-void cpu_log_RAM(struct CPU *cpu_ptr, word start, word end) {
+void cpu_log_RAM(struct CPU *cpu_ptr, word start, word end, char fmt) {
     printf("\nRAM cells 0x%04x through 0x%04x\n", start, end);
-    for (int i = start; i <= end; i++) {
-        printf("RAM[0x%04x] 0x%02x\n", i, (byte)cpu_ptr->RAM[i]);
+    for (int i = start; i <= end; i+=2) {
+        // TODO: do a check to see if the PC or SP or KSP is pointing to these 2 addresses 
+        byte content_low = (byte)cpu_ptr->RAM[i];
+        byte content_high = (byte)cpu_ptr->RAM[i+1];
+        switch(fmt) {
+            case 'x': printf("0x%04x [ 0x%02x 0x%02x ]\n", i, content_low, content_high); break;
+            case 'd': printf("0x%04x [ %3d %3d ]\n", i, content_low, content_high); break;
+            case 'c': printf("0x%04x [ %c %c ]\n", i, content_low, content_high); break;
+        }
+        
     }
 }
 
@@ -79,7 +90,7 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             cpu_ptr->PC += 4;
             break;
         case 0x04: { // GET r1-16 r1-16 IMM
-            if (dev) {printf("GET r%d RAM[0x%02x] (0x%02x, %d)", a, b, (sbyte)c, (sbyte)c);}
+            if (dev) {printf("GET r%d RAM[0x%02x + (0x%02x, %d)]", a, b, (sbyte)c, (sbyte)c);}
             // TODO: Memory protection
             word addr = cpu_ptr->registers[b] + (sbyte)c;
             cpu_ptr->registers[a] = cpu_ptr->RAM[addr] | (cpu_ptr->RAM[addr + 1] << 8);
@@ -95,6 +106,26 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             cpu_ptr->RAM[addr+0] = cpu_ptr->registers[a] & 0xFF;
             // high byte
             cpu_ptr->RAM[addr+1] = cpu_ptr->registers[a] >> 8;
+            cpu_ptr->PC += 4;
+            break;
+        }
+        case 0x06: { // GETB r0-15 r0-15 IMM
+            // TODO: Memory protection
+            if (dev) {printf("GETB r%d RAM[r%d + (0x%02x, %d)]", a, b, (sbyte)c, (sbyte)c);}
+            word addr = cpu_ptr->registers[b] + (sbyte)c;
+            cpu_ptr->registers[a] = cpu_ptr->RAM[addr];
+            cpu_ptr->PC += 4;
+            break;
+        }
+        case 0x07: { // STRB r0-15 r0-15 IMM
+            // TODO: Memory protection 
+            // get address
+            word addr = cpu_ptr->registers[b] + (sbyte)c;
+
+            if (dev) {printf("STRB r%d RAM[0x%02x] (0x%02x, %d)", a, addr, (sbyte)c, (sbyte)c);}
+            
+            // low byte
+            cpu_ptr->RAM[addr] = cpu_ptr->registers[a] & 0xFF;
             cpu_ptr->PC += 4;
             break;
         }
@@ -190,6 +221,22 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             break;
         }
 
+        // Bitwise instructions
+        case 0x81: { // AND rDST rSRC1 rSRC2
+            if (dev) {printf("AND r%d r%d r%d", a, b, c);};
+
+            cpu_ptr->registers[a] = cpu_ptr->registers[b] & cpu_ptr->registers[c];
+            cpu_ptr->PC += 4;
+            break;
+        }
+
+        case 0x82: { // XOR rDST rSRC1 rSRC2
+            if (dev) {printf("AND r%d r%d r%d", a, b, c);};
+
+            cpu_ptr->registers[a] = cpu_ptr->registers[b] ^ cpu_ptr->registers[c];
+            cpu_ptr->PC += 4;
+            break;
+        }
 
         // Control instructions 
         case 0xc0: // HLT;
@@ -220,7 +267,6 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             }
             break;
         }
-
         case 0xc7: { // IJIF rSRC IMM_LOW IMM_HIGH
             if (dev) {printf("IJIF r%d 0x%02x 0x%02x", a, b, c);};
             word addr = (c << 8) | b;
@@ -229,6 +275,58 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             }else {
                 cpu_ptr->PC+=4;
             }
+            break;
+        }
+
+        // Stack instructions
+        case 0xf1: { // push
+            
+        }
+
+        case 0xf2: { // pop
+
+        }
+
+        case 0xf3: { // call
+            word addr = (a) | (b << 8);
+            if (dev) {printf("CALL 0x%04x", addr);};
+            
+            // move the stack pointer down
+            cpu_ptr->SP -= 2;
+
+            // get the return address
+            word return_addr = cpu_ptr->PC + 4; // we want to return to the instruction after call
+            
+            // turn the return address into a low and high byte
+            byte low_return = return_addr & 0xff;
+            byte high_return = return_addr >> 8;
+
+            // put the bytes in the stack
+            cpu_ptr->RAM[cpu_ptr->SP+0] = low_return;
+            cpu_ptr->RAM[cpu_ptr->SP+1] = high_return;
+
+            // set PC to the immediate 
+            cpu_ptr->PC = addr;
+
+            break;
+        }
+        case 0xf4: { // ret
+            
+            // get return addr bytes
+            byte low = cpu_ptr->RAM[cpu_ptr->SP];
+            byte high = cpu_ptr->RAM[cpu_ptr->SP+1];
+            
+            // move the stack pointer up
+            cpu_ptr->SP += 2;
+            
+            // combine return addr into word
+            word return_addr = low | (high << 8);
+            
+            if (dev) {printf("RET 0x%04x", return_addr);};
+
+            // set pc to return addr
+            cpu_ptr->PC = return_addr;
+
             break;
         }
 

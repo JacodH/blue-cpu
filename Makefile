@@ -11,6 +11,5 @@ all:
 	$(CC) $(SRC) $(INCLUDE) -o $(OUT)
 
 # Build assembler.exe
-assemble:
+asm:
 	node $(ASSEMBLER) $(FILE)
-	

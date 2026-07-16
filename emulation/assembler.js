@@ -11,6 +11,8 @@ var opcode_lookup_table = {
     "CLR": {code: "0x03", operands: ["reg"]},
     "GET": {code: "0x04", operands: ["reg", "reg", "byte"]},
     "STR": {code: "0x05", operands: ["reg", "reg", "byte"]},
+    "GETB": {code: "0x06", operands: ["reg", "reg", "byte"]},
+    "STRB": {code: "0x07", operands: ["reg", "reg", "byte"]},
 
     // disk
     "DREAD": {code: "0xd1", operands: ["reg", "reg"]},
@@ -34,6 +36,10 @@ var opcode_lookup_table = {
     "LTS": {code: "0xb5", operands: ["reg", "reg", "reg"]},
     "GTS": {code: "0xb6", operands: ["reg", "reg", "reg"]},
 
+    // bitwise
+    "AND": {code: "0x81", operands: ["reg", "reg", "reg"]},
+    "XOR": {code: "0x82", operands: ["reg", "reg", "reg"]},
+
     // control 
     "HLT": {code: "0xc0", operands: []},
     "NOP": {code: "0xc1", operands: []},
@@ -46,6 +52,10 @@ var opcode_lookup_table = {
 
     // emulator
     "OUT": {code: "0xe1", operands: ["reg"]},
+
+    // stack
+    "CALL": {code: "0xf3", operands: ["word"]},
+    "RET": {code: "0xf4", operands: []},
 
     // "   ": "0x  ",
 }
@@ -289,7 +299,16 @@ fs.readFile(asm_file_path, 'utf8', (err, data) => {
                 }
 
                 // it must be a integer immediate 
-                lines[i][j] = "0x"+toHex(lines[i][j]);
+                // but this is a word not a byte
+                // so we need to separate it between a low byte and high byte
+                let low_byte = toHex(lines[i][j] & 0xFF, 2);
+                let high_byte = toHex(lines[i][j] >> 8, 2);
+
+                // console.log("FOUND FOUND FOUND!!");
+                // console.log(`low byte: ${low_byte}\nhigh byte: ${high_byte}`);
+                
+                lines[i][j] = "0x"+low_byte;
+                lines[i][j+1] = "0x"+high_byte;
                 continue;
             }
         }

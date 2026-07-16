@@ -1,8 +1,11 @@
+; 1.asm
+; prints a string stored in .data
+
 .text
 SET r1 @string; r0 = pointer to string
 
-print_loop:
-    GET r2 r1 0; get char at pointer
+print:
+    GETB r2 r1 0; get char at pointer
 
     ; r0 = null term
 
@@ -16,7 +19,7 @@ print_loop:
 
     OUT r2; emulator print (for now), could just put this to the screen pointer once that exists. 
 
-    IJMP $print_loop; loop back
+    IJMP $print; loop back
 
 print_break:
     HLT;

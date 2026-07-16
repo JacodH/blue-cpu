@@ -11,7 +11,8 @@ struct CPU {
     bool kernel;          // Kernel bit (1 = kernel mode 0 = user mode)
 
     word PC;              // Program counter
-    word SP;              // Stack counter
+    word SP;              // Stack pointer
+    word KSP;             // Kernel stack pointer
     word BASE;            // memory protection base
     word LIMIT;           // memory protection limit
 
@@ -22,7 +23,7 @@ struct CPU {
 void cpu_init(struct CPU *cpu_ptr);
 
 void cpu_log_registers(struct CPU *cpu_ptr);
-void cpu_log_RAM(struct CPU *cpu_ptr, word start, word end);
+void cpu_log_RAM(struct CPU *cpu_ptr, word start, word end, char fmt);
 
 // returns byte at memory addr
 byte cpu_fetch(struct CPU *cpu_ptr, int addr);
