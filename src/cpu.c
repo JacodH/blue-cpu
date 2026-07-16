@@ -182,6 +182,14 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             break;
         }
 
+        // Comparison instructions
+        case 0xb1: {
+            if (dev) {printf("EQ  r%d r%d r%d", a, b, c);};
+            cpu_ptr->registers[a] = (cpu_ptr->registers[b] == cpu_ptr->registers[c]);
+            cpu_ptr->PC += 4;
+            break;
+        }
+
 
         // Control instructions 
         case 0xc0: // HLT;
@@ -202,11 +210,32 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             cpu_ptr->PC = a;
             break;
         
+        case 0xc6: { // IJIT rSRC IMM_LOW IMM_HIGH
+            if (dev) {printf("IJIT r%d 0x%02x 0x%02x", a, b, c);};
+            word addr = (c << 8) | b;
+            if (cpu_ptr->registers[a] == 1) {
+                cpu_ptr->PC = addr;
+            }else {
+                cpu_ptr->PC+=4;
+            }
+            break;
+        }
+
+        case 0xc7: { // IJIF rSRC IMM_LOW IMM_HIGH
+            if (dev) {printf("IJIF r%d 0x%02x 0x%02x", a, b, c);};
+            word addr = (c << 8) | b;
+            if (cpu_ptr->registers[a] == 0) {
+                cpu_ptr->PC = addr;
+            }else {
+                cpu_ptr->PC+=4;
+            }
+            break;
+        }
 
         // Emulation instructions 
         case 0xe1: // OUT r1-16
             if (dev == false) {printf("\n");};
-            printf("OUT r%d = [0x%04x, %d]", a, cpu_ptr->registers[a], cpu_ptr->registers[a]); 
+            printf("OUT r%d = [0x%04x, %d, %c]", a, cpu_ptr->registers[a], cpu_ptr->registers[a], cpu_ptr->registers[a]); 
             cpu_ptr->PC += 4;
             break;
 

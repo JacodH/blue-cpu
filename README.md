@@ -118,14 +118,16 @@ Division by zero returns 0.
 | 0xb6 | Greater than comparison signed    |                | GTS  | rDST | rSRC1 | rSRC2 | rDST = (s)rSRC1 > (s)rSRC2 |
 
 #### Control instructions
-| Code | Description     | Privilege note | Name | a     | b    | c | Pseudo                         |
-|------|-----------------|----------------|------|-------|------|---|-------------------------------|
-| `0xC0` | Halts the CPU    |                | HLT  |          |      |   | Stops CPU                     |
-| `0xC1` | No operation      |                | NOP  |          |      |   |                               |
-| `0xC2` | Jump to address   |                | JMP  | rADDR    |      |   | PC = rADDR                    |
-| `0xC3` | Jump to immediate |                | IJMP  | IMM_ADDR |      |   | PC = IMM_ADDR                 |
-| `0xC4` | Jump if true      |                | JIT  | rADDR    | rSRC |   | if (rSRC == true) PC = rADDR  |
-| `0xC5` | Jump if false     |                | JIF  | rADDR    | rSRC |   | if (rSRC == false) PC = rADDR |
+| Code   | Description             | Privilege note | Name | a        | b        | c        | Pseudo                           |
+|--------|-------------------------|----------------|------|----------|----------|----------|----------------------------------|
+| `0xC0` | Halts the CPU           |                | HLT  |          |          |          | Stops CPU                        |
+| `0xC1` | No operation            |                | NOP  |          |          |          |                                  |
+| `0xC2` | Jump to address         |                | JMP  | rADDR    |          |          | PC = rADDR                       |
+| `0xC3` | Jump to immediate       |                | IJMP | IMM_ADDR |          |          | PC = IMM_ADDR                    |
+| `0xC4` | Jump if true            |                | JIT  | rADDR    | rSRC     |          | if (rSRC == true) PC = rADDR     |
+| `0xC5` | Jump if false           |                | JIF  | rADDR    | rSRC     |          | if (rSRC == false) PC = rADDR    |
+| `0xc6` | Immediate jump if true  |                | IJIT | rSRC     | IMM_ADDR | IMM_ADDR | if (rSRC == true) PC = IMM_ADDR  |
+| `0xc7` | Immediate jump if flase |                | IJIF | rSRC     | IMM_ADDR | IMM_ADDR | if (rSRC == false) PC = IMM_ADDR |
 
 #### Stack instructions
 #### Emulation instructions
