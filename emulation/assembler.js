@@ -294,7 +294,11 @@ fs.readFile(asm_file_path, 'utf8', (err, data) => {
 
                 // check if its hex immediate 
                 if (lines[i][j].includes("0x")) {
-                    // EXACTLY WHAT WE WANT BABY
+                    let low_byte = toHex(lines[i][j] & 0xFF, 2);
+                    let high_byte = toHex(lines[i][j] >> 8, 2);
+
+                    lines[i][j] = "0x"+low_byte;
+                    lines[i][j+1] = "0x"+high_byte;
                     continue;
                 }
 

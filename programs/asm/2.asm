@@ -36,7 +36,6 @@ CALL $str_cmp;
 SET r2 @correct;
 IJIT r1 $hlt;
 CALL $str_print;
-HLT;
 
 hlt: 
     HLT;

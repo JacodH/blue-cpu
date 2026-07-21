@@ -4,6 +4,7 @@
  */
 
 #include <stdint.h>
+#include "util.h"
 
 struct CPU {
     byte RAM[RAM_SIZE];   // 64 KB RAM 

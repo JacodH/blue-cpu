@@ -10,6 +10,9 @@
 #define DISK_SIZE 524288   // 512 kb
 #define BLOCK_SIZE 512     // 512 bytes
 
+#define VRAM_START 0xF9DA  // where vram starts = 0xffff - (25*25) 
+#define VRAM_END 0xffff
+
 // I love C so much 
 typedef uint8_t byte;
 typedef uint16_t word;

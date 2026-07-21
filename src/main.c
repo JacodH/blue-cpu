@@ -6,13 +6,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../include/screen.h"
 #include "../include/util.h"
 #include "../include/disk.h"
 #include "../include/cpu.h"
 
+#undef main
+
 int main() {
     printf("blue-cpu\n");
 
+
+    // init cpu emulator
     struct CPU cpu;
     cpu_init(&cpu);
     disk_init("emulation/blue.disk");
@@ -20,23 +25,11 @@ int main() {
     // cpu_log_RAM(&cpu, 0x0000, 0x000A);
     // cpu_log_registers(&cpu);
 
-    // cheat program loading for testing 
-    // byte program[] = {
-    //     0x01, 0x01, 0x20, 0x00,
-    //     0x04, 0x02, 0x01, 0x00,
-    //     0xb1, 0x03, 0x02, 0x00,
-    //     0xc6, 0x03, 0x1c, 0x00,
-    //     0xa7, 0x01, 0x01, 0x01,
-    //     0xe1, 0x02, 0x00, 0x00,
-    //     0xc3, 0x04, 0x00, 0x00,
-    //     0xc0, 0x00, 0x00, 0x00,
-    //     0x42, 0x65, 0x6c, 0x6c,
-    //     0x6f, 0x21, 0x00, 0x00,
-    //     0x00, 0x00,
-    // };
+    // init emulator screen
+    struct Screen screen = create_screen(8*25, 8*25, 2);
 
-    // load a compiled program 
-    char loaded[] = "programs/hex/2.hex";
+    // load a compiled program from file
+    char loaded[] = "programs/hex/3.hex";
     printf("Loading from '%s'\n", loaded);
     
     byte program[65536]; // program buffer
@@ -50,9 +43,15 @@ int main() {
         cpu.RAM[i] = program[i];
     }
 
+    int frame = 0;
+
     printf("Starting execution\n");
+    SDL_SetWindowTitle(screen.window, "blue-cpu | running");
     // fetch decode execute loop
     while (cpu.running == true) {
+        // check to see if user tried to close the CPU
+        check_close(&screen);
+
         // fetch
         byte opcode = cpu_fetch(&cpu, cpu.PC);
         byte a = cpu_fetch(&cpu, cpu.PC+1);
@@ -62,11 +61,38 @@ int main() {
         // decode and execute 
         cpu_execute(&cpu, opcode, a, b, c, false);
 
-        // draw VRAM to screen
+        // only render screen every 100 instructions 
+        frame++;
+        if (frame >= 100) {
+            frame = 0;
+            // clear the screen
+            clear_screen(&screen);
+            // draw vram
+            draw_vram(&screen, &cpu);
+            // update buffer
+            SDL_RenderPresent(screen.renderer);
+        }
+        // SDL_Delay(1);
     }
-    printf("\n");
+    printf("Finished execution\n");
+    SDL_SetWindowTitle(screen.window, "blue-cpu | halted");
 
-    cpu_log_RAM(&cpu, 0x00d4, size, 'c');
+    cpu_log_RAM(&cpu, VRAM_START, VRAM_END, 'c');
 
+    while (1) {
+        // check if user closed emulator 
+        check_close(&screen);
+
+        // clear the screen
+        clear_screen(&screen);
+        
+        // draw vram
+        draw_vram(&screen, &cpu);
+        
+        // update buffer
+        SDL_RenderPresent(screen.renderer);
+    
+        SDL_Delay(16);
+    }
     return 0;
 }

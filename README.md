@@ -1,4 +1,4 @@
-# _blue_\-cpu
+# \_blue\_-cpu
 
 Custom CPU and ISA running on a emulator made for research and practice in the C language.
 
@@ -39,25 +39,24 @@ No massive computation aside from pure emulation. ISA instructions should remain
 
 ### Notes
 
-*   640 by 200 pixel screen (80 by 25 characters)
+*   200 by 200 pixel screen (25\*5 by 25\*8 characters, window is also scaled up)
+    *   625 byte VRAM
 *   64KB RAM (16 bit address space)
 *   16 registers
 *   512KB disk
 *   Little endian (low byte first)
 *   Lapse OS
-*   Kernel / User mode
-*   SYSCALL + SYSRET instruction
-*   Interrupts (keyboard, timer, fault)
+    *   Kernel / User mode
+    *   SYSCALL + SYSRET instruction
+    *   Interrupts (keyboard, timer, fault)
 
 ### Memory map
 
 | Region name | Start | Stop | Size | Purpose |
 | --- | --- | --- | --- | --- |
-| Boot jump | `0x0000` | `0x0002` | 3 bytes | Tells the CPU where to jump for OS boot / first instruction |
-| Vector table | `0x0003` | `0x0008` | 6 bytes | Tells the CPU where to set the PC to on interrupt |
-| Font table | `0x0009` | `0x0301` | 760 bytes | Font table for VRAM (95 char \* 8 bytes per char = 760 bytes) |
-| Free RAM | `0x0302` | `0xF830` | ~62KB | Free RAM for programs / OS |
-| VRAM | `0xF831` | `0xFFFF` | 2000 bytes | Memory mapped screen |
+| Free RAM | `0x0000` | `0xFB98` | 64,409 bytes | Free RAM for programs / OS |
+| Programs stack | ~0xFB99 | 0xFD8D | 500 bytes (truly variable) | Stack for programs, grows downward. Well give it like 500 bytes |
+| VRAM | `0xFD8E` | `0xFFFF` | 625 bytes | Memory mapped screen |
 
 The stack starts at `0xF830` (the top of free RAM) and grows downward.
 
@@ -90,10 +89,10 @@ _**Kernel required:**_ This instruction can only be executed while the kernel mo
 
 | Code | Description | Privilege note | Name | a | b | c | Pseudo |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `0x01` | Sets register to immediate |   | SET | rTAR | IMM\_LOW | IMM\_HIGH | rTAR = (IMM\_HIGH \<\< 8)| IMM\_LOW |
+| `0x01` | Sets register to immediate |   | SET | rTAR | IMM\_LOW | IMM\_HIGH | rTAR = (IMM\_HIGH \<\< 8) |
 | `0x02` | Copies content from register to register |   | MOV | rSRC | rDST |   | rDST = rSRC |
 | `0x03` | Clears content in register |   | CLR | rTAR |   |   | rTAR = 0 |
-| `0x04` | Loads RAM from register + offset | Memory check | GET | rDST | rSRC | IMM (signed) | rDST = RAM\[rSRC+IMM\]| (RAM\[rSRC+IMM+1\] \<\< 8) |
+| `0x04` | Loads RAM from register + offset | Memory check | GET | rDST | rSRC | IMM (signed) | rDST = RAM\[rSRC+IMM\] |
 | `0x05` | Store register into RAM to address + offset | Memory check | STR | rSRC | rDST | IMM (signed) | RAM\[rDST+IMM\] = rSRC & 0xFF (low byte) RAM\[rDST+IMM+1\] = rSRC >> 8 (high byte) |
 
 #### Disk instructions
@@ -152,9 +151,9 @@ Division by zero returns 0.
 | Code | Description | Privilege note | Name | a | b | c | Pseudo |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `0xf1` | Pushes register to the stack |   | PUSH | rSRC |   |   | SP -= 2; RAM\[SP\] = rSRC & 0xFF; RAM\[SP+1\] = rSRC >> 8 |
-| `0xf2` | Pops to register from the stack |   | POP | rSRC |   |   | rSRC = RAM\[SP\] | (RAM\[SP+1\] \<\< 8); SP+=2; |
-| `0xf3` | Pushes PC to stack, jumps to immediate |   | CALL | IMM\_LOW | IMM\_HIGH |   | SP-=2; RAM\[SP\] = PC; PC = IMM\_LOW| (IMM\_HIGH \<\< 8) |
-| `0xf4` | Pops PC from the stack, jumps to it |   | RET |   |   |   | PC = RAM\[SP\] | (RAM\[SP+1\] \<\< 8); SP+=2; |
+| `0xf2` | Pops to register from the stack |   | POP | rSRC |   |   | rSRC = RAM\[SP\] |
+| `0xf3` | Pushes PC to stack, jumps to immediate |   | CALL | IMM\_LOW | IMM\_HIGH |   | SP-=2; RAM\[SP\] = PC; PC = IMM\_LOW |
+| `0xf4` | Pops PC from the stack, jumps to it |   | RET |   |   |   | PC = RAM\[SP\] |
 
 #### Emulation instructions
 
