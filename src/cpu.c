@@ -220,6 +220,22 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             cpu_ptr->PC += 4;
             break;
         }
+        case 0xb3: {
+            if (dev) {printf("LT  r%d r%d r%d", a, b, c);};
+            word comp_1 = cpu_ptr->registers[b];
+            word comp_2 = cpu_ptr->registers[c];
+
+            cpu_ptr->registers[a] = (comp_1 < comp_2);
+            cpu_ptr->PC += 4;
+            break;
+        }
+        case 0xb4: {
+            if (dev) {printf("GT  r%d r%d r%d", a, b, c);};
+            cpu_ptr->registers[a] = (cpu_ptr->registers[b] > cpu_ptr->registers[c]);
+            cpu_ptr->PC += 4;
+            break;
+        }
+
 
         // Bitwise instructions
         case 0x81: { // AND rDST rSRC1 rSRC2
@@ -231,9 +247,25 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
         }
 
         case 0x82: { // XOR rDST rSRC1 rSRC2
-            if (dev) {printf("AND r%d r%d r%d", a, b, c);};
+            if (dev) {printf("XOR r%d r%d r%d", a, b, c);};
 
             cpu_ptr->registers[a] = cpu_ptr->registers[b] ^ cpu_ptr->registers[c];
+            cpu_ptr->PC += 4;
+            break;
+        }
+
+        case 0x83: { // LSH rDST rSRC1 rSRC2
+            if (dev) {printf("RSH r%d r%d r%d", a, b, c);};
+
+            cpu_ptr->registers[a] = cpu_ptr->registers[b] << cpu_ptr->registers[c];
+            cpu_ptr->PC += 4;
+            break;
+        }
+
+        case 0x84: { // RSH rDST rSRC1 rSRC2
+            if (dev) {printf("RSH r%d r%d r%d", a, b, c);};
+
+            cpu_ptr->registers[a] = cpu_ptr->registers[b] >> cpu_ptr->registers[c];
             cpu_ptr->PC += 4;
             break;
         }
@@ -261,9 +293,10 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             if (dev) {printf("IJIT r%d 0x%02x 0x%02x", a, b, c);};
             word addr = (c << 8) | b;
             if (cpu_ptr->registers[a] == 1) {
+                printf(" JUMPED ");
                 cpu_ptr->PC = addr;
             }else {
-                cpu_ptr->PC+=4;
+                cpu_ptr->PC += 4;
             }
             break;
         }
@@ -333,7 +366,7 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
         // Emulation instructions 
         case 0xe1: // OUT r1-16
             if (dev == false) {printf("\n");};
-            printf("OUT r%d = [0x%04x, %d, %c]", a, cpu_ptr->registers[a], cpu_ptr->registers[a], cpu_ptr->registers[a]); 
+            printf("OUT r%d = [0x%04x, d%d, c%c, 0b%016b]", a, cpu_ptr->registers[a], cpu_ptr->registers[a], cpu_ptr->registers[a], cpu_ptr->registers[a]); 
             cpu_ptr->PC += 4;
             break;
 

@@ -39,6 +39,8 @@ var opcode_lookup_table = {
     // bitwise
     "AND": {code: "0x81", operands: ["reg", "reg", "reg"]},
     "XOR": {code: "0x82", operands: ["reg", "reg", "reg"]},
+    "LSH": {code: "0x83", operands: ["reg", "reg", "reg"]},
+    "RSH": {code: "0x84", operands: ["reg", "reg", "reg"]},
 
     // control 
     "HLT": {code: "0xc0", operands: []},
@@ -272,7 +274,7 @@ fs.readFile(asm_file_path, 'utf8', (err, data) => {
                 }
 
                 // it must be a integer immediate 
-                lines[i][j] = "0x"+toHex(lines[i][j], 2);
+                lines[i][j] = "0x"+toHex(parseFloat(lines[i][j]), 2);
             }else if (operand_type == "word") {
                 // words can either be labels or immediate values
 

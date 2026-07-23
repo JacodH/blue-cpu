@@ -29,7 +29,7 @@ int main() {
     struct Screen screen = create_screen(8*25, 8*25, 2);
 
     // load a compiled program from file
-    char loaded[] = "programs/hex/3.hex";
+    char loaded[] = "programs/hex/life.hex";
     printf("Loading from '%s'\n", loaded);
     
     byte program[65536]; // program buffer
@@ -74,10 +74,10 @@ int main() {
         }
         // SDL_Delay(1);
     }
-    printf("Finished execution\n");
+    printf("\nFinished execution\n");
     SDL_SetWindowTitle(screen.window, "blue-cpu | halted");
 
-    cpu_log_RAM(&cpu, VRAM_START, VRAM_END, 'c');
+    // cpu_log_RAM(&cpu, VRAM_START, VRAM_END, 'c');
 
     while (1) {
         // check if user closed emulator 
@@ -87,10 +87,10 @@ int main() {
         clear_screen(&screen);
         
         // draw vram
-        draw_vram(&screen, &cpu);
+        // draw_vram(&screen, &cpu);
         
         // update buffer
-        SDL_RenderPresent(screen.renderer);
+        // SDL_RenderPresent(screen.renderer);
     
         SDL_Delay(16);
     }
