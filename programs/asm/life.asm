@@ -41,7 +41,7 @@
 ; Could be fun and its MUCH more memory efficient 
 ;
 ; Alright now that i know how the data will be stored, how should i start?
-; [ ] Writing buffer to screen
+; [x] Writing buffer to screen
 ;       To make sure its working, ill encode some kinda pattern into the bitmap
 ; [ ] Clearing buffer function 
 ; [ ] grow() die() live() functions
