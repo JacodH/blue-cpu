@@ -162,9 +162,33 @@ fs.readFile(asm_file_path, 'utf8', (err, data) => {
             if (current_directive == ".data") {
                 // data label
                 lines[i] = lines[i].replace(":", "");
-                console.log(`Found RAM pointer data label '${lines[i].split(' ')[0]}' pointing to ${lines[i].split(' ').length-1} bytes`);
-                data_labels.push([lines[i].split(' ')[0], lines[i].split(' ').length-1]);
-                data_hex.push(...lines[i].split(' ').splice(1, lines[i].split(' ').length-1));
+
+                // see if this has a multiplier (*)
+                if (lines[i].includes("*")) {
+                    // line has a multiplier 
+                    let split = lines[i].split(' ');
+                    
+                    // find multiplier value 
+                    let multiplier_value = split[split.indexOf("*")+1]
+                    let multiplied = split[split.indexOf("*")-1]
+                    
+                    console.log(`Found RAM pointer data label '${lines[i].split(' ')[0]}' pointing to ${multiplier_value} bytes`);
+
+                    for (let i = 0; i < multiplier_value; i++) {
+                        data_hex.push(multiplied);
+                    }
+
+                    data_labels.push([lines[i].split(' ')[0], lines[i].split(' ').length-1]);
+                }else {
+                    console.log(`Found RAM pointer data label '${lines[i].split(' ')[0]}' pointing to ${lines[i].split(' ').length-1} bytes`);
+    
+                    console.log([lines[i].split(' ')[0], lines[i].split(' ').length-1]);
+                    data_labels.push([lines[i].split(' ')[0], lines[i].split(' ').length-1]);
+    
+                    console.log(...lines[i].split(' ').splice(1, lines[i].split(' ').length-1));
+                    data_hex.push(...lines[i].split(' ').splice(1, lines[i].split(' ').length-1));
+                }
+                
             }
 
             lines.splice(i, 1);
@@ -346,7 +370,7 @@ fs.readFile(asm_file_path, 'utf8', (err, data) => {
 
 
     // Print out final hex + data hex
-    for (let i = 1; i < final_hex.length; i++) {
+    for (let i = 1; i < final_hex.length+1; i++) {
         process.stdout.write(final_hex[i-1]+" ");
         if (i % 4 == 0) {process.stdout.write("\n");}
     }
