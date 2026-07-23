@@ -1,4 +1,4 @@
-# \_blue\_-cpu
+# _blue_-cpu
 
 Custom CPU and ISA running on a emulator made for research and practice in the C language.
 
