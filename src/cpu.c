@@ -293,7 +293,6 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             if (dev) {printf("IJIT r%d 0x%02x 0x%02x", a, b, c);};
             word addr = (c << 8) | b;
             if (cpu_ptr->registers[a] == 1) {
-                printf(" JUMPED ");
                 cpu_ptr->PC = addr;
             }else {
                 cpu_ptr->PC += 4;

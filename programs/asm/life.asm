@@ -43,7 +43,8 @@
 ; Alright now that i know how the data will be stored, how should i start?
 ; [x] Writing buffer to screen
 ;       To make sure its working, ill encode some kinda pattern into the bitmap
-; [ ] Clearing buffer function 
+; [x] Clearing buffer function 
+; [ ] move functions for moving buff1 to buff2 and vise versa 
 ; [ ] grow() die() live() functions
 ; [ ] testing for all of that
 ; [ ] looping through all the cells 
@@ -52,10 +53,22 @@
 
 .text
 main:
+
+    ; copy from buffer 2 to buffer 1
+    SET r1 @buff2;
+    SET r2 @buff1;
+    CALL $copy_buffer;
+
+    ; render buffer 1
     CALL $render_buffer;
+
     HLT;
 
-; render_buffer()
+; Notes
+; This function will only ever print buff1
+; can be changed 
+; Parameters
+; 
 ; Variables
 ; r1 = loop counter
 ; r2 = bit offset counter
@@ -68,6 +81,7 @@ main:
 ; r13 = immediate load for conditions and operations 
 ; r14 = conditional jump checks
 render_buffer:
+    ; Pseudo 
     ; r1 = 0
     ; r3 = VRAM_START
     ; for r1 < 78
@@ -87,7 +101,7 @@ render_buffer:
         ; bit offset counter = 0
         SET r2 0;
 
-        OUT r1;
+        ; OUT r1;
 
         ; get byte at r1 + buff pointer
         ; add offset
@@ -99,8 +113,6 @@ render_buffer:
 
         RB_bit_loop:
 
-            ; OUT r5;
-
             ; get last bit in byte
             SET r13 0x0001; 
             ; r6 = byte & 0x0001
@@ -110,10 +122,21 @@ render_buffer:
             SET r13 1;
             RSH r5 r5 r13;
 
-            OUT r6;
+            ; OUT r6;
+
             ; send to vram!
-            IADD r6 r6 48;
-            STRB r6 r3 0;
+            ; if (r6 == 1) {draw "#"} else {draw " "}
+            IJIF r6 $RB_draw_0;
+            RB_draw_1:
+                SET r13 35; "#"
+                IJMP $RB_draw_end
+
+            RB_draw_0:
+                SET r13 32; " "
+                IJMP $RB_draw_end
+
+            RB_draw_end:
+                STRB r13 r3 0;
 
             ; increment vram pointer
             IADD r3 r3 1;
@@ -140,13 +163,91 @@ render_buffer:
         RET;
 
 
-
-
+; Parameters
+; r1 = buff pointer
+; Variables
+; r2 = loop counter
 clear_buffer:
     ; clears buffer being pointed at by r1
     ; once i > buff_size return
 
+    SET r2 0x0000; loop counter
+    SET r3 0x0000; 0
+
+    CB_loop: 
+
+        ADD r2 r2 r1;
+        STRB r3 r2 0;
+        SUB r2 r2 r1;
+
+        ; end of CB_loop logic 
+        ; r2++;
+        IADD r2 r2 1;
+
+        ; if (r2 > 78) {return}
+        SET r13 78;
+        GT r14 r2 r13;
+        IJIT r14 $CB_return;
+
+        IJMP $CB_loop;
+
+    CB_return:
+        RET;
+
+    ; jump back to loop
+    IJMP $RB_byte_loop;
+
+; Parameters 
+; r1  = buffer src pointer (w+r)
+; r2  = buffer dst pointer (w+r)
+; Variables
+; r3  = loop counter
+; r4  = byte buffer
+; r14 = immediate loads and conditionals
+copy_buffer: 
+    ; Pseudo code
+    ; for (let i = 0; i < 78; i++) {
+    ;      RAM[dst_ptr+i] = RAM[src_ptr+i];
+    ; }
+
+
+    ; for loop: init
+    ; i = 0
+    SET r3 0x0000; loop counter
+    SET r4 0x0000; byte buffer
+    CpyBuff_loop:
+
+        ; get byte from src buff
+        ADD r3 r3 r1;
+        OUT r3;
+        GETB r4 r3 0;
+        SUB r3 r3 r1;
+
+        ; str byte to dst buff
+        ADD r3 r3 r2;
+        ; OUT r3;
+        STRB r4 r3 0;
+        SUB r3 r3 r2;
+
+
+        ; for loop: condition
+        ; if (i < 78)
+        SET r14 78;
+        LT r14 r3 r14; (r14 = r3 < r14)
+        IJIF r14 $CpyBuff_end;
+
+        ; for loop: increment 
+        ; i++
+        IADD r3 r3 1;
+
+        IJMP $CpyBuff_loop;
+
+    CpyBuff_end:
+        RET;
+
+
+
 .data
     ; Need 2 78 byte buffers
-    buff1: 0xAA * 78
-    buff2: 0x00 * 78
+    buff1: 0x00 * 78
+    buff2: 0xAA * 78

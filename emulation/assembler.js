@@ -180,7 +180,7 @@ fs.readFile(asm_file_path, 'utf8', (err, data) => {
                         data_hex.push(multiplied);
                     }
 
-                    data_labels.push([lines[i].split(' ')[0], lines[i].split(' ').length-1]);
+                    data_labels.push([lines[i].split(' ')[0], parseInt(multiplier_value)]);
                 }else {
                     console.log(`Found RAM pointer data label '${lines[i].split(' ')[0]}' pointing to ${lines[i].split(' ').length-1} bytes`);
     
@@ -292,13 +292,14 @@ fs.readFile(asm_file_path, 'utf8', (err, data) => {
                         // check 
                         if (label[0].includes(lines[i][j])) {
                             // replace label requester to pointer
+
                             lines[i][j] = label[1][0];    // low
                             lines[i][j+1] = label[1][1];  // high
                             break;
                         }
                     }
-                }
-                if (lines[i][j].includes("$")) {
+                    continue;
+                }else if (lines[i][j].includes("$")) {
                     // includes a pointer to a function label
                     
                     // cleaning
@@ -316,10 +317,7 @@ fs.readFile(asm_file_path, 'utf8', (err, data) => {
                             break;
                         }
                     }
-                }
-
-                // check if its hex immediate 
-                if (lines[i][j].includes("0x")) {
+                } else if (lines[i][j].includes("0x")) {
                     let low_byte = toHex(lines[i][j] & 0xFF, 2);
                     let high_byte = toHex(lines[i][j] >> 8, 2);
 

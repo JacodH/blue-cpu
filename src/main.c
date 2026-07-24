@@ -77,7 +77,7 @@ int main() {
     printf("\nFinished execution\n");
     SDL_SetWindowTitle(screen.window, "blue-cpu | halted");
 
-    // cpu_log_RAM(&cpu, VRAM_START, VRAM_END, 'c');
+    // cpu_log_RAM(&cpu, 0xF0, 0x188, 'x');
 
     while (1) {
         // check if user closed emulator 
