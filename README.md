@@ -1,4 +1,4 @@
-# _blue_\-cpu
+# \_blue\_-cpu
 
 Custom CPU and ISA running on a emulator made for research and practice in the C language.
 
@@ -117,6 +117,7 @@ Division by zero returns 0.
 | 0xa6 | Divides two signed registerse |   | SDIV | rDST | rSRC1 | rSRC2 | rDST = (s)rSRC1 / (s)rSRC2 |
 | 0xa7 | Adds an immediate to a register |   | IADD | rDST | rSRC | IMM | rDST = rSRC + IMM |
 | 0xa8 | Subtracts an immediate from a register |   | ISUB | rDST | rSRC | IMM | rDST = rSRC - IMM |
+| 0xa9 | Returns remainder of division |   | MOD | rDST | rSRC | rSRC2 | rDST = rSRC1 % rSRC2 |
 
 #### Comparison instructions
 
@@ -131,7 +132,7 @@ Division by zero returns 0.
 
 #### Bitwise instructions
 
-<table><tbody><tr><td>Code</td><td>Description</td><td>Privilege note</td><td>Name</td><td>a</td><td>b</td><td>c</td><td>Pseudo</td></tr><tr><td>0x81</td><td>&nbsp;</td><td>&nbsp;</td><td>AND</td><td>rDST</td><td>rSRC1</td><td>rSRC2</td><td>rDST = rSRC1 &amp; rSRC2</td></tr><tr><td>0x82</td><td>&nbsp;</td><td>&nbsp;</td><td>XOR</td><td>rDST</td><td>rSRC1</td><td>rSRC2</td><td>rDST = rSRC1 ^ rSRC2</td></tr><tr><td>0x83</td><td>&nbsp;</td><td>&nbsp;</td><td>LSH</td><td>rDST</td><td>rSRC1</td><td>rSRC2</td><td>rDST = rSRC1 &lt;&lt; rSRC2</td></tr><tr><td>0x84</td><td>&nbsp;</td><td>&nbsp;</td><td>RSH</td><td>rDST</td><td>rSRC1</td><td>rSRC2</td><td>rDST = rSRC1 &gt;&gt; rSRC2</td></tr></tbody></table>
+<table><tbody><tr><td>Code</td><td>Description</td><td>Privilege note</td><td>Name</td><td>a</td><td>b</td><td>c</td><td>Pseudo</td></tr><tr><td>0x81</td><td>&nbsp;</td><td>&nbsp;</td><td>AND</td><td>rDST</td><td>rSRC1</td><td>rSRC2</td><td>rDST = rSRC1 &amp; rSRC2</td></tr><tr><td>0x82</td><td>&nbsp;</td><td>&nbsp;</td><td>XOR</td><td>rDST</td><td>rSRC1</td><td>rSRC2</td><td>rDST = rSRC1 ^ rSRC2</td></tr><tr><td>0x83</td><td>&nbsp;</td><td>&nbsp;</td><td>LSH</td><td>rDST</td><td>rSRC1</td><td>rSRC2</td><td>rDST = rSRC1 &lt;&lt; rSRC2</td></tr><tr><td>0x84</td><td>&nbsp;</td><td>&nbsp;</td><td>RSH</td><td>rDST</td><td>rSRC1</td><td>rSRC2</td><td>rDST = rSRC1 &gt;&gt; rSRC2</td></tr><tr><td>0x85</td><td>&nbsp;</td><td>&nbsp;</td><td>OR</td><td>rDST</td><td>rSRC1</td><td>rSRC2</td><td>rDST = rSRC1 | rSRC2</td></tr></tbody></table>
 
 #### Control instructions
 

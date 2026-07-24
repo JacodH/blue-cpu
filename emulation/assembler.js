@@ -27,6 +27,7 @@ var opcode_lookup_table = {
     "SDIV": {code: "0xa6", operands: ["reg", "reg", "reg"]},
     "IADD": {code: "0xa7", operands: ["reg", "reg", "byte"]},
     "ISUB": {code: "0xa8", operands: ["reg", "reg", "byte"]},
+    "MOD": {code: "0xa9", operands: ["reg", "reg", "reg"]},
 
     // comparison 
     "EQ": {code: "0xb1", operands: ["reg", "reg", "reg"]},
@@ -41,6 +42,7 @@ var opcode_lookup_table = {
     "XOR": {code: "0x82", operands: ["reg", "reg", "reg"]},
     "LSH": {code: "0x83", operands: ["reg", "reg", "reg"]},
     "RSH": {code: "0x84", operands: ["reg", "reg", "reg"]},
+    "OR":  {code: "0x85", operands: ["reg", "reg", "reg"]},
 
     // control 
     "HLT": {code: "0xc0", operands: []},
@@ -56,6 +58,9 @@ var opcode_lookup_table = {
     "OUT": {code: "0xe1", operands: ["reg"]},
 
     // stack
+    "PUSH": {code: "0xf1", operands: ["reg"]},
+    "POP": {code: "0xf2", operands: ["reg"]},
+
     "CALL": {code: "0xf3", operands: ["word"]},
     "RET": {code: "0xf4", operands: []},
 

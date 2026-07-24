@@ -26,7 +26,7 @@ int main() {
     // cpu_log_registers(&cpu);
 
     // init emulator screen
-    struct Screen screen = create_screen(8*25, 8*25, 2);
+    struct Screen screen = create_screen(8*25, 8*25, 4);
 
     // load a compiled program from file
     char loaded[] = "programs/hex/life.hex";

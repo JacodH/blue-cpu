@@ -212,6 +212,19 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             cpu_ptr->PC += 4;
             break;
         }
+        case 0xa9: { // MOD r1-16 r1-16 r1-16
+            if (dev) {printf("MOD r%d r%d r%d", a, b, c);};
+            if (cpu_ptr->registers[c] == 0) {
+                // Can't divide by 0
+                cpu_ptr->registers[a] = 0;
+                cpu_ptr->PC += 4;
+                break;
+            }else {
+                cpu_ptr->registers[a] = cpu_ptr->registers[b] % cpu_ptr->registers[c];
+                cpu_ptr->PC += 4;
+                break;
+            }
+        }
 
         // Comparison instructions
         case 0xb1: {
@@ -255,7 +268,7 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
         }
 
         case 0x83: { // LSH rDST rSRC1 rSRC2
-            if (dev) {printf("RSH r%d r%d r%d", a, b, c);};
+            if (dev) {printf("LSH r%d r%d r%d", a, b, c);};
 
             cpu_ptr->registers[a] = cpu_ptr->registers[b] << cpu_ptr->registers[c];
             cpu_ptr->PC += 4;
@@ -266,6 +279,14 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             if (dev) {printf("RSH r%d r%d r%d", a, b, c);};
 
             cpu_ptr->registers[a] = cpu_ptr->registers[b] >> cpu_ptr->registers[c];
+            cpu_ptr->PC += 4;
+            break;
+        }
+
+        case 0x85: { // OR rDST rSRC1 rSRC2
+            if (dev) {printf("OR r%d r%d r%d", a, b, c);};
+
+            cpu_ptr->registers[a] = cpu_ptr->registers[b] | cpu_ptr->registers[c];
             cpu_ptr->PC += 4;
             break;
         }
@@ -312,11 +333,42 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
 
         // Stack instructions
         case 0xf1: { // push
+            if (dev) {printf("PUSH r%d", a);};
             
+            // move the stack pointer down
+            cpu_ptr->SP -= 2;
+            
+            // move the registers content to the stack
+            
+            // low byte
+            cpu_ptr->RAM[cpu_ptr->SP] = cpu_ptr->registers[a] & 0xFF;
+            // high byte
+            cpu_ptr->RAM[cpu_ptr->SP+1] = cpu_ptr->registers[a] >> 8;
+
+
+            cpu_ptr->PC += 4;
+            break;
         }
 
         case 0xf2: { // pop
+            if (dev) {printf("POP r%d", a);};
 
+            // load the word into the register
+            byte low = cpu_ptr->RAM[cpu_ptr->SP];
+            byte high = cpu_ptr->RAM[cpu_ptr->SP+1];
+
+            // combine into word
+            word value = low | (high << 8);
+
+            // set register
+            cpu_ptr->registers[a] = value;
+
+            // move stack pointer up
+            cpu_ptr->SP += 2;
+
+
+            cpu_ptr->PC += 4;
+            break;
         }
 
         case 0xf3: { // call
@@ -376,7 +428,7 @@ void cpu_execute(struct CPU *cpu_ptr, byte opcode, byte a, byte b, byte c, bool 
             break;
 
         default: 
-            printf("\nUnknown opcode '0x%02x'\n", opcode);
+            printf("\nUnknown opcode '0x%02x' at PC=0x%04x\n", opcode, cpu_ptr->PC);
             cpu_ptr->running = false;
 
     }
